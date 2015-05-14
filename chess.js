@@ -43,26 +43,30 @@ var transporter = nodemailer.createTransport({
  */
 exports.signUp = function(req, res) {
     var user = req.body;
-    bcrypt.genSalt(10, function(err, salt){
-    	bcrypt.hash(user.pw, salt, function(err, hash){
-    		user.pw = hash;
-    		db.collection('users', function(err, collection) {
-		    	collection.findOne({'userId': {$eq: user.userId}}, function(err, item){
-		    		if(item == null){
-				        collection.insert(user, {safe:true}, function(err, result) { //ev update mit $setoninsert und $upsert: true
-				            if (!err) {
-				                collection.update({'userId': {$eq: user.userId}}, {$set: {'status': 'offline'}}, function(err, result){
-									res.sendStatus(201);
-								});
-				            }
-				        });
-					}else{
-						res.sendStatus(409);
-					}
+    if(user.pw === user.pw2){
+	    bcrypt.genSalt(10, function(err, salt){
+	    	bcrypt.hash(user.pw, salt, function(err, hash){
+	    		user.pw = hash;
+	    		db.collection('users', function(err, collection) {
+			    	collection.findOne({'userId': {$eq: user.userId}}, function(err, item){
+			    		if(item == null){
+					        collection.insert({'userId': user.userId, 'pw': user.pw, 'email': user.email, 'status': 'offline'}, {safe:true}, function(err, result) {
+					        	if(err){
+					        		res.sendStatus(409);
+					        	}else{
+					        		res.sendStatus(201);
+					        	}
+					        });
+						}else{
+							res.sendStatus(409);
+						}
+		    		});
 	    		});
-    		});
-    	});
-    });
+	    	});
+	    });
+	}else{
+		res.sendStatus(409);
+	}
 }
 
 
@@ -77,29 +81,32 @@ exports.logIn = function(req, res){
 	var user = req.body;
 	db.collection('users', function(err, collection) {
 		collection.findOne({'userId': {$eq: userId}}, function(err, item){
-			bcrypt.compare(user.pw, item.pw, function(error, isMatch){
-				if(isMatch){
-					collection.update({'userId': {$eq: userId}}, {$set: {'status': 'online'}}, function(err, result){
-						res.sendStatus(204);
-					});
-				}else{
-					res.sendStatus(404);
-				}
-			});
+			if(item != null){
+				bcrypt.compare(user.pw, item.pw, function(error, isMatch){
+					if(isMatch){
+						collection.update({'userId': {$eq: userId}}, {$set: {'status': 'online'}}, function(err, result){
+							res.sendStatus(204);
+						});
+					}else{
+						res.sendStatus(404);
+					}
+				});
+			}else{
+				res.sendStatus(404);
+			}
 		});
 	});
 }
 
 
 /*
- * logOut
+ * logOut					//falsche userId führt noch zu 204
  * takes email as input
  * returns 200 if logOut successful
  * returns 404 if account not found (due to wrong email)
  */
 exports.logOut = function(req, res){
 	var userId = req.params.userId;
-	var user = req.body;
 	db.collection('users', function(err, collection) {		
 		collection.update({'userId': {$eq: userId}}, {$set: {'status': 'offline'}}, function(err, result){
 			if(!err){
@@ -139,11 +146,19 @@ exports.allUsers = function(req, res){
  */
 exports.allOnlineUsers = function(req, res){
 	db.collection('users', function(err, collection){
-		collection.find({'status': {$eq: 'online'}},{'_id': 0, 'userId': 1}).toArray(function(err, items){
-			var itemsJson = JSON.stringify(items);
-			itemsJson = '{"users" : ' + itemsJson + '}';
-			res.status(200).send(itemsJson)
-		});
+		if(!err){
+			collection.find({'status': {$eq: 'online'}},{'_id': 0, 'userId': 1}).toArray(function(err, items){
+				if(!err){
+					var itemsJson = JSON.stringify(items);
+					itemsJson = '{"users" : ' + itemsJson + '}';
+					res.status(200).send(itemsJson)
+				}else{
+					res.sendStatus(409);
+				}
+			});
+		}else{
+			res.sendStatus(409);
+		}
 	});
 };
 
@@ -156,14 +171,28 @@ exports.allOnlineUsers = function(req, res){
  */
 exports.newMatch = function(req, res){
 	var match = req.body;
-	var matchId = match.user1 + '_' + match.user2 + '_' + crypto.randomBytes(8).toString('hex');
-	db.collection('matches', function(err, collection) {
-		collection.insert({'matchId': matchId, 'user1': match.user1, 'user2': match.user2}, function(err, item){
-			if (!err) {							
-				res.status(201).send(matchId);
-		    }else{
-		    	res.sendStatus(409);
-		    }
+	db.collection('users', function(err, collection) {
+		collection.findOne({'userId': {$eq: match.user1}}, function(err, item){ 
+			if(item != null){
+				collection.findOne({'userId': {$eq: match.user2}}, function(err, item){
+					if(item != null){
+						var matchId = match.user1 + '_' + match.user2 + '_' + crypto.randomBytes(8).toString('hex');
+						db.collection('matches', function(err, collection) {
+							collection.insert({'matchId': matchId, 'user1': match.user1, 'user2': match.user2, 'type': match.type, 'status': 0}, function(err, item){
+								if (!err) {							
+									res.status(201).send(matchId);
+							    }else{
+							    	res.sendStatus(409);
+							    }
+							});
+						});
+					}else{
+						res.sendStatus(404);	
+					}
+				});
+			}else{
+				res.sendStatus(404);
+			}
 		});
 	});
 };
@@ -174,11 +203,11 @@ exports.newMatch = function(req, res){
  *
  */
 exports.changeMatchStatus = function(req, res){
-	var match = req.body;
+	var matchId = req.params.matchId;
 	db.collection('matches', function(err, collection) {
-		collection.findOne({'matchId': {$eq: match.matchId}}, function(err, item){ 									//findOne redundant
+		collection.findOne({'matchId': {$eq: matchId}}, function(err, item){ 									//findOne redundant
 			if(item != null){
-				collection.update({'matchId': {$eq: match.matchId}}, {$set: {'status': match.status}}, function(err, result){
+				collection.update({'matchId': {$eq: matchId}}, {$set: {'status': req.body.status}}, function(err, result){
 					res.sendStatus(200);
 				});
 			}else{
@@ -195,7 +224,7 @@ exports.changeMatchStatus = function(req, res){
  */
 exports.getAllMatches = function(req, res){
 	db.collection('matches', function(err, collection){
-		collection.find({},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1}).toArray(function(err, items){
+		collection.find({},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1, 'type': 1}).toArray(function(err, items){
 			var itemsJson = JSON.stringify(items);
 			itemsJson = '{"matches" : ' + itemsJson + '}';
 			res.status(200).send(itemsJson)
@@ -212,10 +241,13 @@ exports.getMatch = function(req, res){
 	var matchId = req.params.matchId;
 	var match = req.body;
 	db.collection('matches', function(err, collection){
-		collection.find({'matchId': {$eq: matchId}},{'_id': 0}).toArray(function(err, items){
-			var itemsJson = JSON.stringify(items);
-			itemsJson = '{"matches" : ' + itemsJson + '}';
-			res.status(200).send(itemsJson)
+		collection.findOne({'matchId': {$eq: matchId}},{'_id': 0} ,function(err, item){
+			if(item != null){
+				var itemsJson = JSON.stringify(item);
+				res.status(200).send(itemsJson)
+			}else{
+				res.sendStatus(404);
+			}
 		});
 	});
 };
@@ -227,14 +259,34 @@ exports.getMatch = function(req, res){
  */
 exports.getMatchByUser = function(req, res){
 	var userId = req.params.userId;
-	var user = req.body;
-	db.collection('matches', function(err, collection){
-		collection.find({'user1': {$eq: userId}},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1}).toArray(function(err, items){
-			var itemsJson = JSON.stringify(items);
-			itemsJson = '{"matches" : ' + itemsJson + '}';
-			res.status(200).send(itemsJson)
+	var status = req.body.status;
+	
+	if(status == null){
+		console.log('status is null');
+		db.collection('matches', function(err, collection){
+			collection.find({$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}]},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1}).toArray(function(err, items){
+				if(!err){
+					var itemsJson = JSON.stringify(items);
+					itemsJson = '{"matches" : ' + itemsJson + '}';
+					res.status(200).send(itemsJson);
+				}else{
+					res.sendStatus(409);
+				}
+			});
 		});
-	});
+	}else{
+		db.collection('matches', function(err, collection){
+			collection.find({$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}], 'status': {$eq: status}},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1}).toArray(function(err, items){
+				if(!err){
+					var itemsJson = JSON.stringify(items);
+					itemsJson = '{"matches" : ' + itemsJson + '}';
+					res.status(200).send(itemsJson);
+				}else{
+					res.sendStatus(409);
+				}
+			});
+		});
+	}
 };
 
 
@@ -247,7 +299,7 @@ exports.deleteUser = function(req, res) {
 	var user = req.body;
 	db.collection('users', function(err, collection) {
 		collection.findOne({'userId': {$eq: userId}}, function(err, item){
-			if(err){
+			if(item == null){
 				res.sendStatus(404);
 			}else{
 				bcrypt.compare(user.pw, item.pw, function(error, isMatch){
@@ -279,28 +331,32 @@ exports.forgotPassword = function(req, res){
 	db.collection('users', function(err, collection) {
 		collection.findOne({'userId': {$eq: userId}}, function(err, item){
 		
-		 	var newPw =  crypto.randomBytes(8).toString('hex');
+			if(item != null){
+			 	var newPw =  crypto.randomBytes(8).toString('hex');
 
-			var mailOptions = {
-				from: 'pdmchess-Support <pdmchess@gmail.com>',
-				to: item.email,
-				subject: 'Your password has been reset!',
-				text: 'Hi ' + userId + ', this is your temporary password: ' + newPw
-			};
+				var mailOptions = {
+					from: 'pdmchess-Support <pdmchess@gmail.com>',
+					to: item.email,
+					subject: 'Your password has been reset!',
+					text: 'Hi ' + userId + ', this is your temporary password: ' + newPw
+				};
 
-			transporter.sendMail(mailOptions, function(error, info){
-				bcrypt.genSalt(10, function(err, salt){
-					bcrypt.hash(newPw, salt, function(err, hash){
-						collection.update({'userId': userId}, {$set: {'pw': hash}}, function(err, result){
-							if(err){
-								res.sendStatus(409);
-							}else{
-								res.sendStatus(200);
-							}
+				transporter.sendMail(mailOptions, function(error, info){
+					bcrypt.genSalt(10, function(err, salt){
+						bcrypt.hash(newPw, salt, function(err, hash){
+							collection.update({'userId': userId}, {$set: {'pw': hash}}, function(err, result){
+								if(err){
+									res.sendStatus(409);
+								}else{
+									res.sendStatus(200);
+								}
+							});
 						});
 					});
 				});
-			});
+			}else{
+				res.sendStatus(404);
+			}
 		});
 	});
 }
@@ -313,27 +369,31 @@ exports.forgotPassword = function(req, res){
 exports.changePassword = function(req, res){
 	var userId = req.params.userId;
 	var user = req.body;
-	db.collection('users', function(err, collection) {
-		collection.findOne({'userId': {$eq: userId}}, function(err, item){
-			if(item != null){
-				bcrypt.compare(user.oldpw, item.pw, function(error, isMatch){
-					if(isMatch){
-						bcrypt.genSalt(10, function(err, salt){
-							bcrypt.hash(user.newpw, salt, function(err, hash){
-								collection.update({'userId': {$eq: userId}}, {$set: {'pw': hash}}, function(err, result){
-									res.sendStatus(200);
+	if(user.newpw === user.newpw2){
+		db.collection('users', function(err, collection) {
+			collection.findOne({'userId': {$eq: userId}}, function(err, item){
+				if(item != null){
+					bcrypt.compare(user.oldpw, item.pw, function(error, isMatch){
+						if(isMatch){
+							bcrypt.genSalt(10, function(err, salt){
+								bcrypt.hash(user.newpw, salt, function(err, hash){
+									collection.update({'userId': {$eq: userId}}, {$set: {'pw': hash}}, function(err, result){
+										res.sendStatus(200);
+									});
 								});
 							});
-						});
-					}else{
-						res.sendStatus(409);
-					}	
-				});
-			}else{
-				res.sendStatus(404);
-			}
+						}else{
+							res.sendStatus(409);
+						}	
+					});
+				}else{
+					res.sendStatus(404);
+				}
+			});
 		});
-	});
+	}else{
+		res.sendStatus(409);
+	}
 }
 
 
@@ -344,11 +404,25 @@ exports.changePassword = function(req, res){
 exports.move = function(req, res){
 	var match = req.body;
 	db.collection('matches', function(err, collection) {
-		collection.update({'matchId': {$eq: match.matchId}},{'matchId': match.matchId, 'user1': match.user1, 'user2': match.user2, 'moves': match.moves}, function(err, result){
-			if(err){
-				res.sendStatus(404);
+		collection.findOne({'matchId': {$eq: match.matchId}},function(err, item){
+			if(item != null){
+				collection.update({'matchId': {$eq: match.matchId}},{'matchId': match.matchId, 'user1': match.user1,'user2': match.user2, 'moves': match.moves}, function(err, result){
+					if(err){
+						res.sendStatus(409);
+					}else{
+						console.log('kein error');
+						collection.findOne({'matchId': {$eq: match.matchId}},{'_id': 0}, function(err, item){
+							if(err){
+								res.sendStatus(409);
+							}else{
+								var itemJson = JSON.stringify(item);
+								res.status(200).send(item);
+							}
+						});
+					}
+				});
 			}else{
-				res.sendStatus(200);
+				res.sendStatus(404);
 			}
 		});
 	});	
