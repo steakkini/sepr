@@ -6,7 +6,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var chess = require('./routes/chess');
 var node_server = express();
+var cors = require('cors');
 
+node_server.use(cors());
 node_server.use(bodyParser.json());
 node_server.use(bodyParser.urlencoded({
 	extended: true
