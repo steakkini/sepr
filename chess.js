@@ -570,27 +570,275 @@ exports.move = function(req, res){
 	});
 }
 
-/*
 exports.pgnToMoves = function(req, res){
+	var pgn = req.body.split(".");
+	//über alle Doppelzüge iterieren
+	var Moves = {
+		moves : []
+	};
+	for(var cnt=1; cnt< pgn.length;cnt++){
+		//entfernen der aufzählung am ende des Substrings
+		var tmp =pgn[cnt].substring(0, pgn[cnt].length-2);
+		// trennen des Doppelzugs in zwei einel Züge
+		var zuge = tmp.split(" ");
+		var zuga =zuge[0];
+		var zugb =zuge[1];	
 
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'pgnToMoves', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
+		Moves.moves.push(pgnzToMovesz(2-(cnt*2),zuga));
+		Moves.moves.push(pgnzToMovesz((2-(cnt*2))+1,zugb));
+	}
+	res.status(200).send(Moves);
+}
+function  pgnzToMovesz(nr,pgn){
 
+var	userId="nope";
+var	startCol;
+var	startRow;
+var	endCol;
+var	endRow;
+var	figure ="pawn";
+var	info;		
+var comment="nocomment";
+var	time="notime";
+	figure = pawn;
+	info = normal;
+	if(pgn.includes("x")){
+		info =capture;
+	}
+	if(pgn.includes("N")){
+		figure = "kight";
+	}
+	if(pgn.includes("K")){
+		figure = "king";
+	}
+	if(pgn.includes("Q")){
+		figure = "queen";
+	}
+	if(pgn.includes("!")){
+		info = "check";
+	}
+	if(pgn.includes("B")){
+		figure = "bishop";
+	}
+	if(pgn.includes("R")){
+		figure = "rook";
+	}
+	if(pgn.includes("1-0")||pgn.includes("0-1")) {
+		info = "check mate"
+	}
+	if(pgn.includes("+")){
+		info = "castling";
+	}	
+	if(figure =="pawn)"){
+		startCol = pgn.charAt(0);
+		startRow = pgn.charAt(1);
+		endCol = pgn.charAt(3);
+		endRow = pgn.charAt(4);
+	}else{
+		startCol = pgn.charAt(1);
+		startRow = pgn.charAt(2);		
+		endCol = pgn.charAt(4);
+		endRow = pgn.charAt(5);		
+	}
+	return  {moveNr:nr, userId:userId, startCol:startCol,startRow:startRow, endCol:endCol, endRow:endRow ,figure:figure,comment:comment,time:time };
 }
 
 exports.movesToPgn = function(req, res){
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'movesToPgn', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
+	var moves=req.body.moves;
+	var out="";
+	// Annahme moves.length = 2 * N --> andernfalls NPE 
+	for(var cnt=0; cnt < moves.length;cnt++){
+		out += (cnt/2+1)+".";
+		//1. spieler
+		switch(moves[cnt].figure){
+		case "pawn":
+			if(moves[cnt].info == "normal"){
+				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
 			}
-		});
-	});
+			if(moves[cnt].info == "capture"){
+				out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0";
+			}
+		break;
+		case "king":
+			if(moves[cnt].info == "normal"){
+				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+			}
+		break;
+		case "queen":
+			if(moves[cnt].info == "normal"){
+				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}	
+			if(moves[cnt].info == "check mate"){
+				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+			}
+		break;
+
+		case "bishop":
+			if(moves[cnt].info == "normal"){
+				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+			}
+		break;
+			
+		case "kight":
+			if(moves[cnt].info == "normal"){
+				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+			}	
+		case "rook":
+			if(moves[cnt].info == "normal"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "castling"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"+ ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+			}
+		break;					
+		default:
+			res.sendStatus(404);
+		break;
+		}	
+		//2. spieler
+		cnt++;
+		switch(moves[cnt].figure){
+		case "pawn":
+			if(moves[cnt].info == "normal"){
+				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 0-1";
+			}
+		break;
+		case "king":
+			if(moves[cnt].info == "normal"){
+				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+			}
+		break;
+		case "queen":
+			if(moves[cnt].info == "normal"){
+				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}	
+			if(moves[cnt].info == "check mate"){
+				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+			}
+		break;
+
+		case "bishop":
+			if(moves[cnt].info == "normal"){
+				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+			}
+		break;
+			
+		case "kight":
+			if(moves[cnt].info == "normal"){
+				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+			}	
+		case "rook":
+			if(moves[cnt].info == "normal"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "capture"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+			}
+			if(moves[cnt].info == "check"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"! ";
+			}
+			if(moves[cnt].info == "castling"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+"+ ";
+			}
+			if(moves[cnt].info == "check mate"){
+				out += "R+"moves[cnt].startCol+moves[cnt].startRow +"-" moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+			}
+		break;					
+		default:
+			res.sendStatus(404);
+		break;
+		}		
+	}
+	// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
+	res.status(200).send(out);
 }
-*/
