@@ -29,8 +29,8 @@ node_server.get('/matches', chess.getAllMatches);
 node_server.get('/matches/byId/:matchId', chess.getMatch);
 node_server.get('/matches/byUser/:userId', chess.getMatchByUser);
 node_server.post('/matches/moves', chess.move);
-//node_server.post('/moves/pgnToMoves', chess.pgnToMoves);
-//node_server.post('/moves/movesToPgn/:matchId', chess.MovesToPgn);
+node_server.post('/moves/pgnToMoves', chess.pgnToMoves);
+node_server.post('/moves/movesToPgn/:matchId', chess.MovesToPgn);
 
 //server accessible on specified port
 node_server.listen(1337);
