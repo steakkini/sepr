@@ -546,7 +546,7 @@ exports.move = function(req, res){
 	db.collection('matches', function(err, collection) {
 		collection.findOne({'matchId': {$eq: match.matchId}},function(err, item){
 			if(item != null){
-				collection.update({'matchId': {$eq: match.matchId}},{'matchId': match.matchId, 'user1': item.user1,'user2': item.user2, 'moves': match.moves}, function(err, result){
+				collection.update({'matchId': {$eq: match.matchId}},{'matchId': match.matchId, 'user1': item.user1,'user2': item.user2, 'type': item.type, 'status': item.status,'moves': match.moves}, function(err, result){
 					if(err){
 						res.sendStatus(409);
 					}else{
