@@ -662,7 +662,14 @@ var	time="notime";
 }
 
 exports.movesToPgn = function(req, res){
-	var moves=req.body.moves;
+	var matchId = req.params.matchId;
+	var matchJSON;
+	db.collection('matches', function(err, collection){
+		collection.findOne({'matchId': {$eq: matchId}},{'_id': 0} ,function(err, item){
+			if(item != null){
+				var matchJSON = JSON.stringify(item);
+
+	var moves=matchJSON.moves;
 	var out="";
 	// Annahme moves.length = 2 * N --> andernfalls NPE 
 	for(var cnt=0; cnt < moves.length;cnt++){
@@ -859,7 +866,11 @@ exports.movesToPgn = function(req, res){
 	}
 	// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
 	res.status(200).send(out);
-
+			}else{
+				res.sendStatus(404);
+			}
+		});
+	});
 	db.collection('logs', function(err, collection){
 		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'movesToPgn', 'headers': req.headers, 'body': req.body}, function(err, result){
 			if(err){
