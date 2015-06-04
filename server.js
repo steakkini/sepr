@@ -28,7 +28,7 @@ node_server.put('/matches/:matchId', chess.changeMatchStatus);
 node_server.get('/matches', chess.getAllMatches);
 node_server.get('/matches/byId/:matchId', chess.getMatch);
 node_server.get('/matches/byUser/:userId', chess.getMatchByUser);
-node_server.post('/matches/moves', chess.move);
+node_server.post('/moves', chess.move);
 node_server.post('/moves/pgnToMoves', chess.pgnToMoves);
 node_server.post('/moves/movesToPgn/:matchId', chess.movesToPgn);
 

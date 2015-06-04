@@ -54,8 +54,13 @@ var transporter = nodemailer.createTransport({
  */
 exports.signUp = function(req, res) {
     var user = req.body;
-
-    if(user.pw === user.pw2){
+    
+    if (user.userId	!= "" && 
+    	user.pw 	!= "" &&
+    	user.pw2 	!= "" &&
+    	user.email 	!= "" &&
+    	user.pw === user.pw2){
+   
 		db.collection('users', function(err, collection) {
 	    	collection.findOne({'userId': {$eq: user.userId}}, function(err, item){		
 	    		if(item == null){
@@ -541,7 +546,7 @@ exports.move = function(req, res){
 	db.collection('matches', function(err, collection) {
 		collection.findOne({'matchId': {$eq: match.matchId}},function(err, item){
 			if(item != null){
-				collection.update({'matchId': {$eq: match.matchId}},{'matchId': match.matchId, 'user1': match.user1,'user2': match.user2, 'moves': match.moves}, function(err, result){
+				collection.update({'matchId': {$eq: match.matchId}},{'matchId': match.matchId, 'user1': item.user1,'user2': item.user2, 'moves': match.moves}, function(err, result){
 					if(err){
 						res.sendStatus(409);
 					}else{
