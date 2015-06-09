@@ -545,8 +545,8 @@ exports.move = function(req, res){
 
 	db.collection('matches', function(err, collection) {
 		collection.findOne({'matchId': {$eq: match.matchId}},function(err, item){
-			if(item != null){
-				collection.update({'matchId': {$eq: match.matchId}},{'matchId': match.matchId, 'user1': item.user1,'user2': item.user2, 'type': item.type, 'status': item.status,'moves': match.moves}, function(err, result){
+			if(item != null){2 
+				collection.update({'matchId': {$eq: match.matchId}},{$addToSet:{'moves': match.moves}}, function(err, result){
 					if(err){
 						res.sendStatus(409);
 					}else{
@@ -554,8 +554,8 @@ exports.move = function(req, res){
 							if(err){
 								res.sendStatus(409);
 							}else{
-								var itemJson = JSON.stringify(item);
-								res.status(200).send(item);
+								var response = "{'matchId:'" + item.matchId +",'user1':"+ item.user1+ ",'user2':"+ item.user2+ ",'type':" +item.type +",'status':" +item.status+ ",'moves': ["+ JSON.stringify(match.moves)+ "]}'";
+								res.status(200).send(response);
 							}
 						});
 					}
@@ -585,7 +585,7 @@ exports.getLogs = function(req, res){
 */
 
 exports.pgnToMoves = function(req, res){
-	var pgn = req.body.split(".");
+	var pgn = req.body.pgn.split(".");
 	//über alle Doppelzüge iterieren
 	var Moves = {
 		moves : []
@@ -593,7 +593,7 @@ exports.pgnToMoves = function(req, res){
 	for(var cnt=1; cnt< pgn.length;cnt++){
 		//entfernen der aufzählung am ende des Substrings
 		var tmp =pgn[cnt].substring(0, pgn[cnt].length-2);
-		// trennen des Doppelzugs in zwei einel Züge
+		// trennen des Doppelzugs in zwei einzel Züge
 		var zuge = tmp.split(" ");
 		var zuga =zuge[0];
 		var zugb =zuge[1];	
@@ -623,33 +623,33 @@ var	figure ="pawn";
 var	info;		
 var comment="nocomment";
 var	time="notime";
-	figure = pawn;
-	info = normal;
-	if(pgn.includes("x")){
-		info =capture;
+	figure = "pawn";
+	info = "normal";
+	if(pgn.indexOf("x") != -1){
+		info ="capture";
 	}
-	if(pgn.includes("N")){
-		figure = "kight";
+	if(pgn.indexOf("N") != -1){
+		figure = "knight";
 	}
-	if(pgn.includes("K")){
+	if(pgn.indexOf("K") != -1){
 		figure = "king";
 	}
-	if(pgn.includes("Q")){
+	if(pgn.indexOf("Q") != -1){
 		figure = "queen";
 	}
-	if(pgn.includes("!")){
+	if(pgn.indexOf("!") != -1){
 		info = "check";
 	}
-	if(pgn.includes("B")){
+	if(pgn.indexOf("B") != -1){
 		figure = "bishop";
 	}
-	if(pgn.includes("R")){
+	if(pgn.indexOf("R") != -1){
 		figure = "rook";
 	}
-	if(pgn.includes("1-0")||pgn.includes("0-1")) {
+	if(pgn.indexOf("1-0") != -1 || pgn.indexOf("0-1") != -1) {
 		info = "check mate"
 	}
-	if(pgn.includes("+")){
+	if(pgn.indexOf("+") != -1){
 		info = "castling";
 	}	
 	if(figure =="pawn)"){
