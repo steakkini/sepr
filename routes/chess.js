@@ -241,6 +241,7 @@ exports.allOnlineUsers = function(req, res){
 exports.newMatch = function(req, res){
 
 	var match = req.body;
+	var moves = [];
 	db.collection('users', function(err, collection) {
 		collection.findOne({'userId': {$eq: match.user1}}, function(err, item){ 
 			if(item != null){
@@ -248,7 +249,7 @@ exports.newMatch = function(req, res){
 					if(item != null){
 						var matchId = match.user1 + '_' + match.user2 + '_' + crypto.randomBytes(8).toString('hex');
 						db.collection('matches', function(err, collection) {
-							collection.insert({'matchId': matchId, 'user1': match.user1, 'user2': match.user2, 'type': match.type, 'status': 0}, function(err, item){
+							collection.insert({'matchId': matchId, 'user1': match.user1, 'user2': match.user2, 'type': match.type, 'status': 0, 'moves': moves}, function(err, item){
 								if (!err) {							
 									res.status(201).send(matchId);
 							    }else{
@@ -668,209 +669,211 @@ var	time="notime";
 
 exports.movesToPgn = function(req, res){
 	var matchId = req.params.matchId;
-	var matchJSON;
+
 	db.collection('matches', function(err, collection){
 		collection.findOne({'matchId': {$eq: matchId}},{'_id': 0} ,function(err, item){
 			if(item != null){
-				var matchJSON = JSON.stringify(item);
+				var moves= item.moves;
+				var out="";
 
-	var moves=matchJSON.moves;
-	var out="";
-	// Annahme moves.length = 2 * N --> andernfalls NPE 
-	for(var cnt=0; cnt < moves.length;cnt++){
-		out += (cnt/2+1)+".";
-		//1. spieler
-		switch(moves[cnt].figure){
-		case "pawn":
-			if(moves[cnt].info == "normal"){
-				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0";
-			}
-		break;
-		case "king":
-			if(moves[cnt].info == "normal"){
-				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
-			}
-		break;
-		case "queen":
-			if(moves[cnt].info == "normal"){
-				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}	
-			if(moves[cnt].info == "check mate"){
-				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
-			}
-		break;
+				console.log(moves);
+				// Annahme moves.length = 2 * N --> andernfalls NPE 
+				
+				for(var cnt=0; cnt < moves.length;cnt++){
+					out += (cnt/2+1)+".";
+					//1. spieler
+					switch(moves[cnt].figure){
+						case "pawn":
+							if(moves[cnt].info == "normal"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0";
+							}
+						break;
+						case "king":
+							if(moves[cnt].info == "normal"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+							}
+						break;
+						case "queen":
+							if(moves[cnt].info == "normal"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}	
+							if(moves[cnt].info == "check mate"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+							}
+						break;
 
-		case "bishop":
-			if(moves[cnt].info == "normal"){
-				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
-			}
-		break;
-			
-		case "kight":
-			if(moves[cnt].info == "normal"){
-				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
-			}	
-		case "rook":
-			if(moves[cnt].info == "normal"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "castling"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
-			}
-		break;					
-		default:
-			res.sendStatus(404);
-		break;
-		}	
-		//2. spieler
-		cnt++;
-		switch(moves[cnt].figure){
-		case "pawn":
-			if(moves[cnt].info == "normal"){
-				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 0-1";
-			}
-		break;
-		case "king":
-			if(moves[cnt].info == "normal"){
-				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
-			}
-		break;
-		case "queen":
-			if(moves[cnt].info == "normal"){
-				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}	
-			if(moves[cnt].info == "check mate"){
-				out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
-			}
-		break;
+						case "bishop":
+							if(moves[cnt].info == "normal"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+							}
+						break;
+							
+						case "kight":
+							if(moves[cnt].info == "normal"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+							}	
+						case "rook":
+							if(moves[cnt].info == "normal"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "castling"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+							}
+						break;					
+						default:
+							//res.sendStatus(404);
+						break;
+					}	
+					//2. spieler
+					cnt++;
+					switch(moves[cnt].figure){
+						case "pawn":
+							if(moves[cnt].info == "normal"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 0-1";
+							}
+						break;
+						case "king":
+							if(moves[cnt].info == "normal"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+							}
+						break;
+						case "queen":
+							if(moves[cnt].info == "normal"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}	
+							if(moves[cnt].info == "check mate"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+							}
+						break;
 
-		case "bishop":
-			if(moves[cnt].info == "normal"){
-				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
-			}
-		break;
-			
-		case "kight":
-			if(moves[cnt].info == "normal"){
-				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
-			}	
-		case "rook":
-			if(moves[cnt].info == "normal"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "capture"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
-			}
-			if(moves[cnt].info == "check"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
-			}
-			if(moves[cnt].info == "castling"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
-			}
-			if(moves[cnt].info == "check mate"){
-				out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
-			}
-		break;					
-		default:
-			res.sendStatus(404);
-		break;
-		}		
-	}
-	// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
-	res.status(200).send(out);
+						case "bishop":
+							if(moves[cnt].info == "normal"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+							}
+						break;
+							
+						case "kight":
+							if(moves[cnt].info == "normal"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+							}	
+						case "rook":
+							if(moves[cnt].info == "normal"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "capture"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+							}
+							if(moves[cnt].info == "check"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+							}
+							if(moves[cnt].info == "castling"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "check mate"){
+								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+							}
+						break;					
+						default:
+							//res.sendStatus(404);
+						break;
+					}		
+				}
+				// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
+				console.log(out);
+				res.status(200).send(JSON.stringify(out));
 			}else{
 				res.sendStatus(404);
 			}
