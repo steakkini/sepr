@@ -368,7 +368,7 @@ exports.getMatchByUser = function(req, res){
 	if(status == null){
 		console.log('status is null');
 		db.collection('matches', function(err, collection){
-			collection.find({'user1': {$eq: userId}},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1}).toArray(function(err, items){
+			collection.find({$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}]},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1}).toArray(function(err, items){
 				if(!err){
 					var itemsJson = JSON.stringify(items);
 					itemsJson = '{"matches" : ' + itemsJson + '}';
@@ -380,13 +380,13 @@ exports.getMatchByUser = function(req, res){
 		});
 	}else{
 		db.collection('matches', function(err, collection){
-			collection.find({'user1': {$eq: userId}, 'status': {$eq: status}},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1}).toArray(function(err, items){
+			collection.find({$and: [{$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}]},{'status': {$eq: status}}]}, {'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1} ).toArray(function(err, items){
 				if(!err){
 					var itemsJson = JSON.stringify(items);
 					itemsJson = '{"matches" : ' + itemsJson + '}';
 					res.status(200).send(itemsJson);
 				}else{
-					res.sendStatus(409);
+					res.status(409).send("conflict");
 				}
 			});
 		});
@@ -546,7 +546,7 @@ exports.move = function(req, res){
 	db.collection('matches', function(err, collection) {
 		collection.findOne({'matchId': {$eq: match.matchId}},function(err, item){
 			if(item != null){2 
-				collection.update({'matchId': {$eq: match.matchId}},{$addToSet:{'moves': match.moves}}, function(err, result){
+				collection.update({'matchId': {$eq: match.matchId}},{$push:{'moves': match.moves}}, function(err, result){
 					if(err){
 						res.sendStatus(409);
 					}else{
