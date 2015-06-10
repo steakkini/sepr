@@ -369,7 +369,7 @@ exports.getMatchByUser = function(req, res){
 	if(status == null){
 		console.log('status is null');
 		db.collection('matches', function(err, collection){
-			collection.find({$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}]},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1}).toArray(function(err, items){
+			collection.find({$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}]},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1, 'type': 1}).toArray(function(err, items){
 				if(!err){
 					var itemsJson = JSON.stringify(items);
 					itemsJson = '{"matches" : ' + itemsJson + '}';
@@ -381,7 +381,7 @@ exports.getMatchByUser = function(req, res){
 		});
 	}else{
 		db.collection('matches', function(err, collection){
-			collection.find({$and: [{$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}]},{'status': {$eq: status}}]}, {'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1} ).toArray(function(err, items){
+			collection.find({$and: [{$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}]},{'status': {$eq: status}}]}, {'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1, 'type': 1}).toArray(function(err, items){
 				if(!err){
 					var itemsJson = JSON.stringify(items);
 					itemsJson = '{"matches" : ' + itemsJson + '}';
