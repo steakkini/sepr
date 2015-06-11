@@ -673,8 +673,13 @@ exports.movesToPgn = function(req, res){
 	db.collection('matches', function(err, collection){
 		collection.findOne({'matchId': {$eq: matchId}},{'_id': 0} ,function(err, item){
 			if(item != null){
+
 				var moves= item.moves;
 				var out="";
+				
+				if(moves.length %2 != 0){
+					res.sendStatus(409);
+				}else{
 
 				console.log(moves);
 				// Annahme moves.length = 2 * N --> andernfalls NPE 
@@ -684,8 +689,10 @@ exports.movesToPgn = function(req, res){
 					//1. spieler
 					switch(moves[cnt].figure){
 						case "pawn":
+						console.log(moves[cnt].figure + " " + moves[cnt].info);
 							if(moves[cnt].info == "normal"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
+							console.log(" if");
 							}
 							if(moves[cnt].info == "capture"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
@@ -753,7 +760,9 @@ exports.movesToPgn = function(req, res){
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
-							}	
+							}
+						break;
+								
 						case "rook":
 							if(moves[cnt].info == "normal"){
 								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
@@ -873,10 +882,12 @@ exports.movesToPgn = function(req, res){
 				}
 				// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
 				console.log(out);
-				res.status(200).send(JSON.stringify(out));
+				res.status(200).send(out);
+				}
 			}else{
 				res.sendStatus(404);
 			}
+			
 		});
 	});
 	db.collection('logs', function(err, collection){
