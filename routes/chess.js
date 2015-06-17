@@ -599,8 +599,8 @@ exports.pgnToMoves = function(req, res){
 		var zuga =zuge[0];
 		var zugb =zuge[1];	
 
-		Moves.moves.push(pgnzToMovesz(2-(cnt*2),zuga));
-		Moves.moves.push(pgnzToMovesz((2-(cnt*2))+1,zugb));
+		Moves.moves.push(pgnzToMovesz((cnt*2)-2,zuga));
+		Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb));
 	}
 	res.status(200).send(Moves);
 
@@ -653,7 +653,7 @@ var	time="notime";
 	if(pgn.indexOf("+") != -1){
 		info = "castling";
 	}	
-	if(figure =="pawn)"){
+	if(figure.equals("pawn")){
 		startCol = pgn.charAt(0);
 		startRow = pgn.charAt(1);
 		endCol = pgn.charAt(3);
