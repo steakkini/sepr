@@ -748,7 +748,7 @@ exports.movesToPgn = function(req, res){
 							}
 						break;
 							
-						case "kight":
+						case "knight":
 							if(moves[cnt].info == "normal"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
