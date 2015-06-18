@@ -471,8 +471,14 @@ exports.pgnToMoves = function(req, res){
 		moves : []
 	};
 	for(var cnt=1; cnt< pgn.length;cnt++){
+		var tmp;
 		//entfernen der aufzählung am ende des Substrings
-		var tmp =pgn[cnt].substring(0, pgn[cnt].length-2);
+		if(cnt!= pgn.length-1 ){
+			tmp =pgn[cnt].substring(0, pgn[cnt].length-2);		
+		}
+		else{
+			tmp =pgn[cnt];	
+		}
 		// trennen des Doppelzugs in zwei einzel Züge
 		var zuge = tmp.split(" ");
 		var zuga =zuge[0];
