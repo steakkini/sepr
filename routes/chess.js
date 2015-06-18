@@ -85,14 +85,6 @@ exports.signUp = function(req, res) {
 	}else{
 		res.sendStatus(409);
 	}
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'signup', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 }
 
 
@@ -124,14 +116,6 @@ exports.logIn = function(req, res){
 			}
 		});
 	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'login', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 }
 
 
@@ -159,14 +143,6 @@ exports.logOut = function(req, res){
 			}
 		});
 	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'logout', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 }
 
 
@@ -185,14 +161,6 @@ exports.allUsers = function(req, res){
 				res.status(200).send(itemsJson);
 			}else{
 				res.sendStatus(409);
-			}
-		});
-	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'allUsers', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
 			}
 		});
 	});
@@ -220,14 +188,6 @@ exports.allOnlineUsers = function(req, res){
 		}else{
 			res.sendStatus(409);
 		}
-	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'allOnlineUsers', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
 	});
 };
 
@@ -266,14 +226,6 @@ exports.newMatch = function(req, res){
 			}
 		});
 	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'newMatch', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 };
 
 
@@ -295,14 +247,6 @@ exports.changeMatchStatus = function(req, res){
 			}
 		});
 	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'changeMatchStatus', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 };
 
 
@@ -316,14 +260,6 @@ exports.getAllMatches = function(req, res){
 			var itemsJson = JSON.stringify(items);
 			itemsJson = '{"matches" : ' + itemsJson + '}';
 			res.status(200).send(itemsJson)
-		});
-	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'getAllMatches', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
 		});
 	});
 };
@@ -344,14 +280,6 @@ exports.getMatch = function(req, res){
 				res.status(200).send(itemsJson)
 			}else{
 				res.sendStatus(404);
-			}
-		});
-	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'getMatchById', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
 			}
 		});
 	});
@@ -392,14 +320,6 @@ exports.getMatchByUser = function(req, res){
 			});
 		});
 	}
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'getMatchByUser', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 };
 
 
@@ -429,14 +349,6 @@ exports.deleteUser = function(req, res) {
 						res.sendStatus(409);
 					}
 				});
-			}
-		});
-	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'deleteUser', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
 			}
 		});
 	});
@@ -482,14 +394,6 @@ exports.forgotPassword = function(req, res){
 			}
 		});
 	});
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'forgotPassword', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 }
 
 
@@ -526,14 +430,6 @@ exports.changePassword = function(req, res){
 	}else{
 		res.sendStatus(409);
 	}
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'changePassword', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 };
 
 
@@ -566,24 +462,7 @@ exports.move = function(req, res){
 			}
 		});
 	});	
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'move', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 }
-/*
-exports.getLogs = function(req, res){
-	db.collection('logs', function(err, collection){
-		collection.find({}, function(err, items){
-
-		});
-	});
-}
-*/
 
 exports.pgnToMoves = function(req, res){
 	var pgn = req.body.pgn.split(".");
@@ -603,14 +482,6 @@ exports.pgnToMoves = function(req, res){
 		Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb));
 	}
 	res.status(200).send(Moves);
-
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'pgnToMoves', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
-		});
-	});
 }
 
 function  pgnzToMovesz(nr,pgn){
@@ -748,7 +619,7 @@ exports.movesToPgn = function(req, res){
 							}
 						break;
 							
-						case "kight":
+						case "knight":
 							if(moves[cnt].info == "normal"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
@@ -765,19 +636,19 @@ exports.movesToPgn = function(req, res){
 								
 						case "rook":
 							if(moves[cnt].info == "normal"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "capture"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "castling"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
 							}
 						break;					
 						default:
@@ -857,22 +728,23 @@ exports.movesToPgn = function(req, res){
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
-							}	
+							}
+						break;
 						case "rook":
 							if(moves[cnt].info == "normal"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "capture"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "castling"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "R+"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
 							}
 						break;					
 						default:
@@ -881,20 +753,12 @@ exports.movesToPgn = function(req, res){
 					}		
 				}
 				// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
-				console.log(out);
 				res.status(200).send(out);
 				}
 			}else{
 				res.sendStatus(404);
 			}
 			
-		});
-	});
-	db.collection('logs', function(err, collection){
-		collection.insert({'date': Date(), 'origin': req.connection.remoteAddress, 'destination': 'movesToPgn', 'headers': req.headers, 'body': req.body}, function(err, result){
-			if(err){
-				console.log(err);
-			}
 		});
 	});
 }
