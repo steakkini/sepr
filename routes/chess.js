@@ -572,7 +572,7 @@ exports.movesToPgn = function(req, res){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0";
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;
 						case "king":
@@ -586,7 +586,7 @@ exports.movesToPgn = function(req, res){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;
 						case "queen":
@@ -600,7 +600,7 @@ exports.movesToPgn = function(req, res){
 								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}	
 							if(moves[cnt].info == "check mate"){
-								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;
 
@@ -615,7 +615,7 @@ exports.movesToPgn = function(req, res){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;
 							
@@ -630,7 +630,7 @@ exports.movesToPgn = function(req, res){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;
 								
@@ -648,7 +648,7 @@ exports.movesToPgn = function(req, res){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;					
 						default:
@@ -669,7 +669,7 @@ exports.movesToPgn = function(req, res){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 0-1";
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;
 						case "king":
@@ -683,7 +683,7 @@ exports.movesToPgn = function(req, res){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" +moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;
 						case "queen":
@@ -697,7 +697,7 @@ exports.movesToPgn = function(req, res){
 								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}	
 							if(moves[cnt].info == "check mate"){
-								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;
 
@@ -712,7 +712,7 @@ exports.movesToPgn = function(req, res){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;
 							
@@ -727,7 +727,7 @@ exports.movesToPgn = function(req, res){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;
 						case "rook":
@@ -744,7 +744,7 @@ exports.movesToPgn = function(req, res){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;					
 						default:
