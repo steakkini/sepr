@@ -523,7 +523,11 @@ var	time="notime";
 	}
 	if(pgn.indexOf("+") != -1){
 		info = "castling";
-	}	
+	}
+	if(pgn.indexOf("=Q") != -1){
+		info = "transform";
+	}
+	
 	if(figure.equals("pawn")){
 		startCol = pgn.charAt(0);
 		startRow = pgn.charAt(1);
@@ -573,6 +577,9 @@ exports.movesToPgn = function(req, res){
 							}
 							if(moves[cnt].info == "check mate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0";
+							}
+							if(moves[cnt].info == "transform"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q";
 							}
 						break;
 						case "king":
@@ -670,6 +677,9 @@ exports.movesToPgn = function(req, res){
 							}
 							if(moves[cnt].info == "check mate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 0-1";
+							}
+							if(moves[cnt].info == "transform"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q";
 							}
 						break;
 						case "king":
