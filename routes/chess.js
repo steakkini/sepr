@@ -509,7 +509,7 @@ var	time="notime";
 	if(pgn.indexOf("Q") != -1){
 		figure = "queen";
 	}
-	if(pgn.indexOf("!") != -1){
+	if(pgn.indexOf("+") != -1){
 		info = "check";
 	}
 	if(pgn.indexOf("B") != -1){
@@ -521,7 +521,7 @@ var	time="notime";
 	if(pgn.indexOf("1-0") != -1 || pgn.indexOf("0-1") != -1) {
 		info = "check mate"
 	}
-	if(pgn.indexOf("+") != -1){
+	if(pgn.indexOf("!") != -1){
 		info = "castling";
 	}
 	if(pgn.indexOf("=Q") != -1){
@@ -573,7 +573,7 @@ exports.movesToPgn = function(req, res){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0";
@@ -590,7 +590,7 @@ exports.movesToPgn = function(req, res){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
@@ -619,7 +619,7 @@ exports.movesToPgn = function(req, res){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
@@ -634,7 +634,7 @@ exports.movesToPgn = function(req, res){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
@@ -649,10 +649,10 @@ exports.movesToPgn = function(req, res){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "castling"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
@@ -673,7 +673,7 @@ exports.movesToPgn = function(req, res){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 0-1";
@@ -690,7 +690,7 @@ exports.movesToPgn = function(req, res){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
@@ -704,7 +704,7 @@ exports.movesToPgn = function(req, res){
 								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}	
 							if(moves[cnt].info == "check mate"){
 								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
@@ -719,7 +719,7 @@ exports.movesToPgn = function(req, res){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
@@ -734,7 +734,7 @@ exports.movesToPgn = function(req, res){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
@@ -748,10 +748,10 @@ exports.movesToPgn = function(req, res){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
 							if(moves[cnt].info == "check"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "castling"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
