@@ -476,19 +476,15 @@ exports.pgnToMoves = function(req, res){
 		// trennen des Doppelzugs in zwei einzel Züge
 		var zuge = tmp.split(" ");
 		var zuga =zuge[0];
-		var zugb;
-		if(tmp.length>1){
-		 zugb =zuge[1];	
-		}
-		Moves.moves.push(pgnzToMovesz((cnt*2)-2,zuga));
-		if(tmp.length>1){
-		 	Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb));	
-		}
+		var zugb =zuge[1];	
+
+		Moves.moves.push(pgnzToMovesz((cnt*2)-2,zuga,"w"));
+		Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb,"b"));
 	}
 	res.status(200).send(Moves);
 }
 
-function  pgnzToMovesz(nr,pgn){
+function  pgnzToMovesz(nr,pgn,wb){
 
 var	userId="nope";
 var	startCol;
@@ -525,9 +521,6 @@ var	time="notime";
 	if(pgn.indexOf("1-0") != -1 || pgn.indexOf("0-1") != -1) {
 		info = "check mate"
 	}
-	if(pgn.indexOf("+") != -1){
-		info = "castling";
-	}
 	if(pgn.indexOf("=Q") != -1){
 		info = "transform";
 	}
@@ -543,6 +536,38 @@ var	time="notime";
 		endCol = pgn.charAt(4);
 		endRow = pgn.charAt(5);		
 	}
+	if(pgn.indexOf("o-o") != -1) {
+		figure = "king";	
+		info = "smallRochade";
+		if(wb=="w")	{
+			startCol = "d";
+			startRow = "1";		
+			endCol = "b";
+			endRow = "1";				
+		}
+		else{
+			startCol = "d";
+			startRow = "8";		
+			endCol = "b";
+			endRow = "8";		
+		}
+	}
+	if(pgn.indexOf("O-O") != -1) {
+		figure = "king";
+		info = "bigRochade";
+		if(wb=="w")	{
+			startCol = "d";
+			startRow = "1";		
+			endCol = "f";
+			endRow = "1";		
+		}
+		else{
+			startCol = "d";
+			startRow = "8";		
+			endCol = "f";
+			endRow = "8";		
+		}		
+	}
 	return  {moveNr:nr, userId:userId, startCol:startCol,startRow:startRow, endCol:endCol, endRow:endRow ,figure:figure,comment:comment,time:time };
 }
 
@@ -555,6 +580,10 @@ exports.movesToPgn = function(req, res){
 
 				var moves= item.moves;
 				var out="";
+				
+				if(moves.length %2 != 0){
+					res.sendStatus(409);
+				}else{
 
 				console.log(moves);
 				// Annahme moves.length = 2 * N --> andernfalls NPE 
@@ -594,6 +623,12 @@ exports.movesToPgn = function(req, res){
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+							}
+							if(moves[cnt].info == "bigRochade"){
+								out +="O-O ";
+							}
+							if(moves[cnt].info == "smallRochade"){
+								out +="o-o ";
 							}
 						break;
 						case "queen":
@@ -651,9 +686,6 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "check"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
 							}
-							if(moves[cnt].info == "castling"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
-							}
 							if(moves[cnt].info == "check mate"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
 							}
@@ -664,8 +696,7 @@ exports.movesToPgn = function(req, res){
 					}	
 					//2. spieler
 					cnt++;
-					if(moves.length  > cnt){
-						switch(moves[cnt].figure){
+					switch(moves[cnt].figure){
 						case "pawn":
 							if(moves[cnt].info == "normal"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
@@ -695,6 +726,12 @@ exports.movesToPgn = function(req, res){
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
+							}
+							if(moves[cnt].info == "bigRochade"){
+								out +="O-O ";
+							}
+							if(moves[cnt].info == "smallRochade"){
+								out +="o-o ";
 							}
 						break;
 						case "queen":
@@ -750,9 +787,6 @@ exports.movesToPgn = function(req, res){
 							}
 							if(moves[cnt].info == "check"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
-							}
-							if(moves[cnt].info == "castling"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
 							if(moves[cnt].info == "check mate"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+" 0-1 ";
