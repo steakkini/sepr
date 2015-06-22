@@ -476,10 +476,14 @@ exports.pgnToMoves = function(req, res){
 		// trennen des Doppelzugs in zwei einzel Züge
 		var zuge = tmp.split(" ");
 		var zuga =zuge[0];
-		var zugb =zuge[1];	
-
++		var zugb;
++		if(tmp.length>1){
++		 zugb =zuge[1];	
++		}
 		Moves.moves.push(pgnzToMovesz((cnt*2)-2,zuga,"w"));
-		Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb,"b"));
++		if(tmp.length>1){
++		 	Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb));	
++		}
 	}
 	res.status(200).send(Moves);
 }
@@ -581,9 +585,7 @@ exports.movesToPgn = function(req, res){
 				var moves= item.moves;
 				var out="";
 				
-				if(moves.length %2 != 0){
-					res.sendStatus(409);
-				}else{
+
 
 				console.log(moves);
 				// Annahme moves.length = 2 * N --> andernfalls NPE 
@@ -696,6 +698,7 @@ exports.movesToPgn = function(req, res){
 					}	
 					//2. spieler
 					cnt++;
++					if(moves.length  > cnt){
 					switch(moves[cnt].figure){
 						case "pawn":
 							if(moves[cnt].info == "normal"){
@@ -797,9 +800,9 @@ exports.movesToPgn = function(req, res){
 						break;
 					}		
 				}
-				// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
-				res.status(200).send(out);
-				}
+			}
+			// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
+			res.status(200).send(out);
 			}else{
 				res.sendStatus(404);
 			}
