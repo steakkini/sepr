@@ -482,7 +482,7 @@ exports.pgnToMoves = function(req, res){
 		}
 		Moves.moves.push(pgnzToMovesz((cnt*2)-2,zuga,"w"));
 		if(tmp.length>1){
-		 	Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb));	
+		 	Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb,"b"));	
 		}
 	}
 	res.status(200).send(Moves);
@@ -497,7 +497,7 @@ var	endCol;
 var	endRow;
 var	figure ="pawn";
 var	info;		
-var comment="nocomment";
+var 	comment="";
 var	time="notime";
 	figure = "pawn";
 	info = "normal";
