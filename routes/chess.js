@@ -472,7 +472,7 @@ exports.pgnToMoves = function(req, res){
 	for(var cnt=1; cnt< pgn.length;cnt++){
 		//entfernen der aufzählung am ende des Substrings
 		var tmp =pgn[cnt];
-		if(cnt < (pgn.length-1){
+		if(cnt < (pgn.length-1)){
 			tmp =pgn[cnt].substring(0, pgn[cnt].length-2);
 		}
 		// trennen des Doppelzugs in zwei einzel Züge
@@ -546,7 +546,7 @@ var	time="notime";
 			}
 		}
 	}
-	if(figure.equals("pawn")){
+	if(figure=="pawn"){
 		startCol = pgn.charAt(0);
 		startRow = pgn.charAt(1);
 		endCol = pgn.charAt(3);
