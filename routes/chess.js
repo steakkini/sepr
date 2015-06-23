@@ -295,7 +295,6 @@ exports.getMatchByUser = function(req, res){
 	var status = req.body.status;
 	
 	if(status == null){
-		console.log('status is null');
 		db.collection('matches', function(err, collection){
 			collection.find({$or: [{'user1': {$eq: userId}}, {'user2': {$eq: userId}}]},{'_id': 0, 'matchId': 1, 'user1': 1, 'user2': 1, 'status': 1, 'type': 1}).toArray(function(err, items){
 				if(!err){
@@ -590,10 +589,7 @@ exports.movesToPgn = function(req, res){
 
 				var moves= item.moves;
 				var out="";
-				
 
-
-				console.log(moves);
 				// Annahme moves.length = 2 * N --> andernfalls NPE 
 				
 				for(var cnt=0; cnt < moves.length;cnt++){
@@ -601,10 +597,8 @@ exports.movesToPgn = function(req, res){
 					//1. spieler
 					switch(moves[cnt].figure){
 						case "pawn":
-						console.log(moves[cnt].figure + " " + moves[cnt].info);
 							if(moves[cnt].info == "normal"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
-							console.log(" if");
 							}
 							if(moves[cnt].info == "capture"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
