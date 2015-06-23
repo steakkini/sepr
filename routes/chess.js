@@ -522,7 +522,7 @@ var	time="notime";
 		figure = "rook";
 	}
 	if(pgn.indexOf("1-0") != -1 || pgn.indexOf("0-1") != -1) {
-		info = "check mate"
+		info = "check mate";
 	}
 	if(pgn.indexOf("=Q") != -1){
 		info = "transform";
