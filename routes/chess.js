@@ -479,11 +479,11 @@ exports.pgnToMoves = function(req, res){
 		var zuge = tmp.split(" ");
 		var zuga =zuge[0];
 		var zugb;
-		if(tmp.length>1){
+		if(zuge.length>1){
 		 zugb =zuge[1];	
 		}
 		Moves.moves.push(pgnzToMovesz((cnt*2)-2,zuga,"w"));
-		if(tmp.length>1){
+		if(zuge.length>1){
 		 	Moves.moves.push(pgnzToMovesz(((cnt*2))-1,zugb,"b"));	
 		}
 	}
