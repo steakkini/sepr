@@ -544,15 +544,15 @@ var	time="notime";
 		figure = "king";	
 		info = "smallRochade";
 		if(wb=="w")	{
-			startCol = "d";
+			startCol = "e";
 			startRow = "1";		
-			endCol = "b";
+			endCol = "g";
 			endRow = "1";				
 		}
 		else{
-			startCol = "d";
+			startCol = "e";
 			startRow = "8";		
-			endCol = "b";
+			endCol = "g";
 			endRow = "8";		
 		}
 	}
@@ -560,15 +560,15 @@ var	time="notime";
 		figure = "king";
 		info = "bigRochade";
 		if(wb=="w")	{
-			startCol = "d";
+			startCol = "e";
 			startRow = "1";		
-			endCol = "f";
+			endCol = "c";
 			endRow = "1";		
 		}
 		else{
-			startCol = "d";
+			startCol = "e";
 			startRow = "8";		
-			endCol = "f";
+			endCol = "c";
 			endRow = "8";		
 		}		
 	}
