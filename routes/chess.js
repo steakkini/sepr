@@ -490,7 +490,7 @@ exports.pgnToMoves = function(req, res){
 
 function  pgnzToMovesz(nr,pgn,wb){
 
-var	userId="nope";
+var	userId;
 var	startCol;
 var	startRow;
 var	endCol;
@@ -572,7 +572,13 @@ var	time="notime";
 			endRow = "8";		
 		}		
 	}
-	return  {moveNr:nr, userId:userId, startCol:startCol,startRow:startRow, endCol:endCol, endRow:endRow ,figure:figure,comment:comment,time:time };
+	if(wb=="w"){
+	userId = "user1";
+	}else{
+	userId = "user2";		
+	}
+	
+	return  {moveNr:nr, userId:userId, startCol:startCol,startRow:startRow, endCol:endCol, endRow:endRow ,figure:figure,comment:comment,time:time, info:info };
 }
 
 exports.movesToPgn = function(req, res){
