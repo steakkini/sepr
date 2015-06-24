@@ -479,7 +479,7 @@ exports.pgnToMoves = function(req, res){
 		var zuge = tmp.split(" ");
 		var zuga =zuge[0];
 		var zugb;
-		if(zuge.length>1){
+		if(tmp.length>1){
 		 zugb =zuge[1];	
 		}
 		Moves.moves.push(pgnzToMovesz((cnt*2)-2,zuga,"w"));
@@ -546,7 +546,7 @@ var	time="notime";
 			}
 		}
 	}
-	if(figure=="pawn"){
+	if(figure==="pawn"){
 		startCol = pgn.charAt(0);
 		startRow = pgn.charAt(1);
 		endCol = pgn.charAt(3);
