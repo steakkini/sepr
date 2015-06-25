@@ -465,17 +465,17 @@ exports.move = function(req, res){
 
 exports.pgnToMoves = function(req, res){
 	var pgn = req.body.pgn.split(".");
-	//über alle Doppelzüge iterieren
+	//Ã¼ber alle DoppelzÃ¼ge iterieren
 	var Moves = {
 		moves : []
 	};
 	for(var cnt=1; cnt< pgn.length;cnt++){
-		//entfernen der aufzählung am ende des Substrings
+		//entfernen der aufzÃ¤hlung am ende des Substrings
 		var tmp =pgn[cnt];
 		if(cnt < (pgn.length-1)){
 			tmp =pgn[cnt].substring(0, pgn[cnt].length-2);
 		}
-		// trennen des Doppelzugs in zwei einzel Züge
+		// trennen des Doppelzugs in zwei einzel ZÃ¼ge
 		var zuge = tmp.split(" ");
 		var zuga =zuge[0];
 		var zugb;
@@ -515,8 +515,11 @@ var	time="notime";
 	if(pgn.indexOf("Q") != -1){
 		figure = "queen";
 	}
-	if(pgn.indexOf("!") != -1){
-		info = "check";
+	if(pgn.indexOf("+") != -1){
+		info = "normal check";
+		if(pgn.indexOf("x") != -1){
+			info ="capture check";
+		}		
 	}
 	if(pgn.indexOf("B") != -1){
 		figure = "bishop";
@@ -525,24 +528,27 @@ var	time="notime";
 		figure = "rook";
 	}
 	if(pgn.indexOf("1-0") != -1 || pgn.indexOf("0-1") != -1) {
-		info = "check mate"
+		info = "normal checkmate"
+			if(pgn.indexOf("x") != -1){
+				info ="capture checkmate";
+			}	
 	}
 	if(pgn.indexOf("=Q") != -1){
-		info = "transform";
+		info = "normal transform";
 		if(pgn.indexOf("x") != -1){
 			info ="capture transform";
-			if(pgn.indexOf("!") != -1){
+			if(pgn.indexOf("+") != -1){
 				info = "capture transform check";
 			}
 			if(pgn.indexOf("1-0") != -1 || pgn.indexOf("0-1") != -1) {
-				info = "capture transform check mate";
+				info = "capture transform checkmate";
 			}			
 		}else{
-			if(pgn.indexOf("!") != -1){
-				info = "transform check";
+			if(pgn.indexOf("+") != -1){
+				info = "normal transform check";
 			}
 			if(pgn.indexOf("1-0") != -1 || pgn.indexOf("0-1") != -1) {
-				info = "transform check mate";
+				info = "normal transform checkmate";
 			}
 		}
 	}
@@ -621,28 +627,34 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
+							if(moves[cnt].info == "capture check"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "normal checkmate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
-							if(moves[cnt].info == "transform"){
+							if(moves[cnt].info == "normal checkmate"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
+							}
+							if(moves[cnt].info == "capture transform"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q ";
 							}
 							if(moves[cnt].info == "capture transform"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"=Q ";
 							}
 							if(moves[cnt].info == "capture transform check"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"! ";
+								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"+ ";
 							}
-							if(moves[cnt].info == "capture transform check mate"){
+							if(moves[cnt].info == "capture transform checkmate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"1-0 ";
 							}
-							if(moves[cnt].info == "transform check"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"! ";
+							if(moves[cnt].info == "normal transform check"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"+ ";
 							}
-							if(moves[cnt].info == "transform check mate"){
+							if(moves[cnt].info == "normal transform checkmate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"1-0 ";
 							}
 						break;
@@ -653,11 +665,17 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
-								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
+							if(moves[cnt].info == "capture check"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "normal checkmate"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
+							}
+							if(moves[cnt].info == "capture checkmate"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 							if(moves[cnt].info == "bigRochade"){
 								out +="O-O ";
@@ -673,11 +691,17 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}	
-							if(moves[cnt].info == "check mate"){
-								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" 1-0 ";
+							if(moves[cnt].info == "normal checkmate"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
+							}
+							if(moves[cnt].info == "capture check"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}	
+							if(moves[cnt].info == "capture checkmate"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;
 
@@ -688,11 +712,17 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
+							if(moves[cnt].info == "normal checkmate"){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
+							}
+							if(moves[cnt].info == "capture check"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "capture checkmate"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;
 							
@@ -703,11 +733,17 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
+							if(moves[cnt].info == "normal checkmate"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
+							}
+							if(moves[cnt].info == "capture check"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "capture checkmate"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;
 								
@@ -718,11 +754,17 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
+							if(moves[cnt].info == "normal checkmate"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
+							}
+							if(moves[cnt].info == "capture check"){
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "capture checkmate"){
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"1-0 ";
 							}
 						break;					
 						default:
@@ -732,7 +774,7 @@ exports.movesToPgn = function(req, res){
 					//2. spieler
 					cnt++;
 					if(moves.length  > cnt){
-					switch(moves[cnt].figure){
+						switch(moves[cnt].figure){
 						case "pawn":
 							if(moves[cnt].info == "normal"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+" ";
@@ -740,29 +782,35 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
+							if(moves[cnt].info == "capture check"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "normal checkmate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
-							if(moves[cnt].info == "transform"){
+							if(moves[cnt].info == "normal checkmate"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							}
+							if(moves[cnt].info == "capture transform"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q ";
 							}
 							if(moves[cnt].info == "capture transform"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"=Q ";
 							}
 							if(moves[cnt].info == "capture transform check"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"! ";
+								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"+ ";
 							}
-							if(moves[cnt].info == "capture transform check mate"){
+							if(moves[cnt].info == "capture transform checkmate"){
 								out += moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"0-1 ";
 							}
-							if(moves[cnt].info == "transform check"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"! ";
+							if(moves[cnt].info == "normal transform check"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"+ ";
 							}
-							if(moves[cnt].info == "transform check mate"){
-								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"1-0 ";
+							if(moves[cnt].info == "normal transform checkmate"){
+								out += moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"=Q"+"0-1 ";
 							}
 						break;
 						case "king":
@@ -772,11 +820,17 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
-								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-K" +moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							if(moves[cnt].info == "capture check"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "normal checkmate"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							}
+							if(moves[cnt].info == "capture checkmate"){
+								out += "K"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 							if(moves[cnt].info == "bigRochade"){
 								out +="O-O ";
@@ -792,11 +846,17 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}	
-							if(moves[cnt].info == "check mate"){
-								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							if(moves[cnt].info == "normal checkmate"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							}
+							if(moves[cnt].info == "capture check"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}	
+							if(moves[cnt].info == "capture checkmate"){
+								out += "Q"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;
 
@@ -807,11 +867,17 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
-								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							if(moves[cnt].info == "normal checkmate"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							}
+							if(moves[cnt].info == "capture check"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "capture checkmate"){
+								out += "B"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;
 							
@@ -822,13 +888,20 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
-								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							if(moves[cnt].info == "normal checkmate"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							}
+							if(moves[cnt].info == "capture check"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "capture checkmate"){
+								out += "N"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;
+								
 						case "rook":
 							if(moves[cnt].info == "normal"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+" ";
@@ -836,20 +909,26 @@ exports.movesToPgn = function(req, res){
 							if(moves[cnt].info == "capture"){
 								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+ moves[cnt].endCol+moves[cnt].endRow+" ";
 							}
-							if(moves[cnt].info == "check"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+ moves[cnt].endCol+moves[cnt].endRow+"! ";
+							if(moves[cnt].info == "normal check"){
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
 							}
-							if(moves[cnt].info == "check mate"){
-								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-" +moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							if(moves[cnt].info == "normal checkmate"){
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"-"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
+							}
+							if(moves[cnt].info == "capture check"){
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"+ ";
+							}
+							if(moves[cnt].info == "capture checkmate"){
+								out += "R"+moves[cnt].startCol+moves[cnt].startRow +"x"+moves[cnt].endCol+moves[cnt].endRow+"0-1 ";
 							}
 						break;					
 						default:
 							//res.sendStatus(404);
 						break;
-					}		
+					}
 				}
 			}
-			// wenn alle Züge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
+			// wenn alle ZÃ¼ge durch iteriert worden sind, wird die konstruierte PGN abgesendet.
 			res.status(200).send(out);
 			}else{
 				res.sendStatus(404);
