@@ -207,11 +207,11 @@ exports.newMatch = function(req, res){
 			if(item != null){
 				collection.findOne({'userId': {$eq: match.user2}}, function(err, item){
 					if(item != null){
-						var matchId = '{"matchId:"' + match.user1 + '_' + match.user2 + '_' + crypto.randomBytes(8).toString('hex')+ '}';
+						var matchId = match.user1 + '_' + match.user2 + '_' + crypto.randomBytes(8).toString('hex');
 						db.collection('matches', function(err, collection) {
 							collection.insert({'matchId': matchId, 'user1': match.user1, 'user2': match.user2, 'type': match.type, 'status': 0, 'moves': moves}, function(err, item){
 								if (!err) {							
-									res.status(201).send(matchId);
+									res.status(201).send('{"matchId:"' + matchId+ '}');
 							    }else{
 							    	res.sendStatus(409);
 							    }
